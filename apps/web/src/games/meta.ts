@@ -176,6 +176,15 @@ export const GAME_META: Record<string, CoverTheme> = {
     tags: ["puzzle", "classics"],
     blurb: "Claim lines. Own the boxes.",
   },
+  chess: {
+    from: "#1a120b",
+    to: "#c4a574",
+    accent: "#f7f3ea",
+    ink: "#1a120b",
+    pattern: "grid",
+    tags: ["classics", "strategy"],
+    blurb: "Standard chess. You play white.",
+  },
 };
 
 export function metaFor(id: string): CoverTheme {

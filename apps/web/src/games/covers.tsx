@@ -173,6 +173,16 @@ function Motif({ id, accent, ink }: { id: string; accent: string; ink: string })
           <path d="M20 48h24" stroke={ink} strokeWidth="3" opacity="0.4" />
         </g>
       );
+    case "chess":
+      return (
+        <g fill={accent}>
+          <rect x="26" y="8" width="4" height="8" />
+          <rect x="22" y="11" width="12" height="4" />
+          <path d="M24 18h8v4h5l2 10H17l2-10h5z" />
+          <rect x="18" y="34" width="20" height="4" rx="1" />
+          <rect x="16" y="42" width="24" height="5" rx="1" />
+        </g>
+      );
     case "dotsboxes":
       return (
         <g>

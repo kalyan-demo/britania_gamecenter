@@ -88,6 +88,8 @@ export function GameBoard({ match, busy, onMove }: Props) {
       return <MemoryBoard match={match} busy={busy} done={done} onMove={onMove} />;
     case "boxes":
       return <BoxesBoard match={match} busy={busy} done={done} onMove={onMove} />;
+    case "chess":
+      return <ChessBoard match={match} busy={busy} done={done} onMove={onMove} />;
     default:
       return <p className="error">unsupported board</p>;
   }
@@ -369,6 +371,135 @@ function reversiHasMove(cells: number[], cols: number) {
     }
   }
   return false;
+}
+
+const CHESS_GLYPH: Record<string, string> = {
+  K: "♚",
+  Q: "♛",
+  R: "♜",
+  B: "♝",
+  N: "♞",
+  P: "♟",
+  k: "♚",
+  q: "♛",
+  r: "♜",
+  b: "♝",
+  n: "♞",
+  p: "♟",
+};
+
+function ChessBoard({
+  match,
+  busy,
+  done,
+  onMove,
+}: {
+  match: Match;
+  busy: boolean;
+  done: boolean;
+  onMove: (body: unknown) => void;
+}) {
+  const state = match.state as {
+    board: string[];
+    turn: "w" | "b";
+    moves: { from: number; to: number; promotion?: string }[];
+    check: boolean;
+    lastFrom: number | null;
+    lastTo: number | null;
+  };
+  const [from, setFrom] = useState<number | null>(null);
+  const [promoTo, setPromoTo] = useState<number | null>(null);
+  const boardKey = state.board.join("");
+
+  useEffect(() => {
+    setFrom(null);
+    setPromoTo(null);
+  }, [match.id, boardKey]);
+
+  const fromMoves = from === null ? [] : state.moves.filter((m) => m.from === from);
+  const targets = new Set(fromMoves.map((m) => m.to));
+  const king = state.check ? (state.turn === "w" ? "K" : "k") : "";
+
+  function choose(i: number) {
+    if (busy || done) return;
+    const piece = state.board[i] ?? "";
+    const mine = piece !== "" && piece === piece.toUpperCase();
+    if (from !== null && targets.has(i)) {
+      const opts = fromMoves.filter((m) => m.to === i);
+      if (opts.some((m) => m.promotion)) {
+        setPromoTo(i);
+        return;
+      }
+      onMove({ from, to: i });
+      return;
+    }
+    if (mine && state.moves.some((m) => m.from === i)) {
+      setFrom(i);
+      setPromoTo(null);
+      return;
+    }
+    setFrom(null);
+    setPromoTo(null);
+  }
+
+  const hint = state.check
+    ? "check — you are white"
+    : from === null
+      ? "you are white — select a piece"
+      : promoTo !== null
+        ? "choose a piece to promote to"
+        : "choose a highlighted square";
+
+  return (
+    <div className="stack" style={{ maxWidth: "none" }}>
+      <p className="hint">{hint}</p>
+      {promoTo !== null && from !== null ? (
+        <div className="row chess-promo">
+          {(["q", "r", "b", "n"] as const).map((piece) => (
+            <button
+              key={piece}
+              type="button"
+              className="btn secondary"
+              disabled={busy}
+              onClick={() => onMove({ from, to: promoTo, promotion: piece })}
+            >
+              {CHESS_GLYPH[piece]}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      <div className="board chess-board" style={fit(8, 8)}>
+        {state.board.map((piece, i) => {
+          const light = (Math.floor(i / 8) + (i % 8)) % 2 === 0;
+          const white = piece !== "" && piece === piece.toUpperCase();
+          const isTarget = targets.has(i);
+          return (
+            <button
+              key={i}
+              type="button"
+              aria-label={"abcdefgh"[i % 8]! + String(8 - Math.floor(i / 8))}
+              className={[
+                "cell",
+                light ? "light" : "dark",
+                white ? "piece-w" : piece ? "piece-b" : "",
+                from === i ? "picked" : "",
+                isTarget ? "target" : "",
+                isTarget && piece ? "capture" : "",
+                i === state.lastFrom || i === state.lastTo ? "fresh" : "",
+                king && piece === king ? "check" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              disabled={busy || done}
+              onClick={() => choose(i)}
+            >
+              {piece ? CHESS_GLYPH[piece] : isTarget ? <span className="chess-dot" /> : null}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function HexapawnBoard({

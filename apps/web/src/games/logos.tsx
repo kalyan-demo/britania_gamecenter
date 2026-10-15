@@ -30,6 +30,7 @@ const GLYPHS: Record<string, { label: string; paths: string }> = {
   memory: { label: "pairs", paths: "M12 12h10v14H12zM26 22h10v14H26z" },
   orderchaos: { label: "order", paths: "M10 34L24 10l14 24M16 26h16" },
   dotsboxes: { label: "boxes", paths: "M14 14h20v20H14zM14 14v20M34 14v20M14 24h20M24 14v20" },
+  chess: { label: "chess", paths: "M24 6v8M18 10h12M16 20h16l-2 14H18zM14 38h20" },
 };
 
 export function GameMark({ id }: { id: string }) {

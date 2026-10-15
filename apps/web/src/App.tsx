@@ -254,6 +254,11 @@ function PlayPage() {
     );
   }
 
+  const chessCheck =
+    match?.status === "playing" &&
+    match.gameId === "chess" &&
+    (match.state as { check?: boolean }).check === true;
+
   const statusText = !match
     ? "loading…"
     : match.winner === "human_win"
@@ -262,7 +267,9 @@ function PlayPage() {
         ? "arcade bot wins"
         : match.winner === "draw"
           ? "draw"
-          : "your move";
+          : chessCheck
+            ? "check"
+            : "your move";
 
   const statusClass =
     match?.winner === "human_win" ? "win" : match?.winner === "bot_win" ? "lose" : "";
