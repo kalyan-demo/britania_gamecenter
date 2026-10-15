@@ -4,9 +4,9 @@ import { api, type GameInfo } from "./api";
 import { GameCover } from "./games/covers";
 import { CATEGORIES, inCategory, metaFor, type GameCategory } from "./games/meta";
 
-const HOT_IDS = ["connectfour", "tictactoe", "gomoku", "reversi", "memory", "nim"];
+const HOT_IDS = ["chess", "connectfour", "tictactoe", "gomoku", "reversi", "memory"];
 const QUICK_IDS = ["tictactoe", "popout", "wildttt", "subtractsquare", "memory", "miserettt"];
-const BRAIN_IDS = ["gomoku", "mancala", "orderchaos", "sos", "hexapawn", "dotsboxes"];
+const BRAIN_IDS = ["chess", "gomoku", "mancala", "orderchaos", "sos", "hexapawn"];
 
 function byIds(games: GameInfo[], ids: string[]) {
   const map = new Map(games.map((g) => [g.id, g]));

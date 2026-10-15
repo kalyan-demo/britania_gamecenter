@@ -31,14 +31,14 @@ scripts/                      dev.sh, dev-stop.sh, prod-start.sh, prod-stop.sh, 
 .github/workflows             EC2 deploy on push to main
 ```
 
-## Games (17)
+## Games (18)
 
 Each game has a lobby description, on-board rules, and a bot. Placing, dropping, and flipping animate on the board.
 
 - Tic-Tac-Toe, Misère Tic-Tac-Toe, Wild Tic-Tac-Toe
 - Connect Four, Connect Three, Drop Three, Power Four
 - Gomoku, Order & Chaos, SOS
-- Reversi, Hexapawn, Mancala, Dots & Boxes
+- Reversi, Hexapawn, Chess, Mancala, Dots & Boxes
 - Nim, Subtract a Square, Memory
 
 ## Auth & admin

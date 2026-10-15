@@ -61,6 +61,8 @@
 .play-fit[data-game="orderchaos"][data-result="lose"] .board { animation-name: board-scribble; }
 .play-fit[data-game="dotsboxes"][data-result="win"] .board { animation-name: board-pop; }
 .play-fit[data-game="dotsboxes"][data-result="lose"] .board { animation-name: board-break; }
+.play-fit[data-game="chess"][data-result="win"] .board { animation-name: board-march; }
+.play-fit[data-game="chess"][data-result="lose"] .board { animation-name: board-shake; }
 
 @keyframes board-bounce {
   0% { transform: scale(0.92); }

@@ -11,6 +11,7 @@ import { hexapawnEngine } from "./games/hexapawn";
 import { mancalaEngine } from "./games/mancala";
 import { memoryEngine } from "./games/memory";
 import { dotsBoxesEngine } from "./games/dots-boxes";
+import { chessEngine } from "./games/chess";
 
 /** Stable lobby order. */
 export const engines: GameEngine[] = [
@@ -31,4 +32,5 @@ export const engines: GameEngine[] = [
   memoryEngine,
   orderChaosEngine,
   dotsBoxesEngine,
+  chessEngine,
 ];
