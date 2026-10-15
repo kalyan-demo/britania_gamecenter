@@ -1,0 +1,46 @@
+{
+  "defaultEnvironment": "production",
+  "orgId": "tnu9YQUIppDHbYQwLx8OSkuyGuqf2gkT",
+  "projectId": "0a172971-65af-4f0b-8fe7-89d500651f15",
+  "projectName": "britania_gamecenter",
+  "rolloutReady": {
+    "attestUrl": "https://app-server.fireweave.ai",
+    "rolloutCredentialEnv": "FIREWEAVE_KEY"
+  },
+  "server": {
+    "url": "https://app-server.fireweave.ai"
+  },
+  "surfaces": [
+    {
+      "entrypoint": "apps/api/src/main.ts",
+      "harnessKind": "package",
+      "path": "apps/api",
+      "rolloutCredentialEnv": "FIREWEAVE_KEY",
+      "surface": "ts-server",
+      "surfaceId": "sfc_01M4Z8R8PZZCT5WE974FQ6RZ78",
+      "trackerPath": ".fireweave/stamps.ts",
+      "sdk": {
+        "name": "@fireweaveai/server-sdk",
+        "version": "3.0.0",
+        "channel": "production"
+      }
+    },
+    {
+      "entrypoint": "apps/web/src/main.tsx",
+      "harnessKind": "package",
+      "metricsClient": "none",
+      "path": "apps/web",
+      "rolloutCredentialEnv": "FIREWEAVE_BROWSER_KEY",
+      "startProfile": "client",
+      "surface": "web",
+      "surfaceId": "sfc_01M4Z8R8PZZCT5WE974FQ6RZ79",
+      "trackerPath": ".fireweave/stamps.ts",
+      "sdk": {
+        "name": "@fireweaveai/web-sdk",
+        "version": "3.0.0",
+        "channel": "production"
+      }
+    }
+  ],
+  "version": 2
+}
