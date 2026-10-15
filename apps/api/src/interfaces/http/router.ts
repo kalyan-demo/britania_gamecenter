@@ -116,7 +116,7 @@ export function createHandler(services: AppServices) {
 
       if (path === "/api/auth/me" && req.method === "GET") {
         const user = await services.auth.me(sessionTokenFromRequest(req));
-        await services.auth.trackSessionRestore(Boolean(user), user?.username, trace);
+        await services.auth.trackSessionRestore(user, trace);
         if (!user) return respond(json({ user: null }));
         return respond(
           json({ user: { id: user.id, username: user.username, role: user.role } }),
@@ -124,7 +124,8 @@ export function createHandler(services: AppServices) {
       }
 
       if (path === "/api/games" && req.method === "GET") {
-        return respond(json({ games: await services.games.listGames(trace) }));
+        const user = await services.auth.me(sessionTokenFromRequest(req));
+        return respond(json({ games: await services.games.listGames(user, trace) }));
       }
 
       const matchGet = path.match(/^\/api\/games\/([^/]+)\/match$/);

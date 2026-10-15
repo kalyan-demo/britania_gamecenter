@@ -1,3 +1,4 @@
+import { fw } from "@fireweaveai/server-sdk/start";
 import { AppError, type MatchDto, type MatchResult, type PublicUser } from "@arcade/shared";
 import type {
   EngineCatalog,
@@ -36,19 +37,37 @@ function traceFields(trace?: TraceCtx) {
   return { traceId: trace?.traceId, parentSpanId: trace?.parentSpanId };
 }
 
+async function chessEnabled(user: PublicUser | null): Promise<boolean> {
+  // @fireweave-controlpoint chess
+  return fw.controlPoints.getBooleanValue(
+    "chess",
+    false,
+    user ? { targetingKey: String(user.id) } : undefined,
+  );
+}
+
+async function assertChessPlayable(user: PublicUser, gameId: string) {
+  if (gameId !== "chess") return;
+  if (!(await chessEnabled(user))) throw new AppError("Unknown game", 404, "not_found");
+}
+
 export function createGameUseCases(deps: {
   matches: MatchRepository;
   engines: EngineCatalog;
   obs: ObservabilityPort;
 }) {
   return {
-    async listGames(trace?: TraceCtx) {
-      const games = deps.engines.list().map((e) => ({
-        id: e.id,
-        name: e.name,
-        description: e.description,
-        rules: e.rules,
-      }));
+    async listGames(user: PublicUser | null, trace?: TraceCtx) {
+      const chessOn = await chessEnabled(user);
+      const games = deps.engines
+        .list()
+        .filter((e) => e.id !== "chess" || chessOn)
+        .map((e) => ({
+          id: e.id,
+          name: e.name,
+          description: e.description,
+          rules: e.rules,
+        }));
       await deps.obs.emitAction({
         event: "lobby.view",
         ...traceFields(trace),
@@ -59,6 +78,7 @@ export function createGameUseCases(deps: {
     },
 
     async getOrCreateMatch(user: PublicUser, gameId: string, trace?: TraceCtx) {
+      await assertChessPlayable(user, gameId);
       const engine = (() => {
         try {
           return deps.engines.require(gameId);
@@ -100,6 +120,7 @@ export function createGameUseCases(deps: {
     },
 
     async newMatch(user: PublicUser, gameId: string, trace?: TraceCtx) {
+      await assertChessPlayable(user, gameId);
       deps.engines.require(gameId);
       const existing = await deps.matches.findActive(user.id, gameId);
       if (existing) {
@@ -117,6 +138,7 @@ export function createGameUseCases(deps: {
       move: unknown,
       trace?: TraceCtx,
     ): Promise<MatchDto> {
+      await assertChessPlayable(user, gameId);
       const engine = (() => {
         try {
           return deps.engines.require(gameId);

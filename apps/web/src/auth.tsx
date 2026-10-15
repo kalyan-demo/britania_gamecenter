@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { fw } from "@fireweaveai/web-sdk/start";
 import { api, setUnauthorizedHandler, type User } from "./api";
 
 type AuthState = {
@@ -30,6 +31,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(next);
     return next;
   }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    if (user) {
+      void fw.identify(String(user.id), { username: user.username, role: user.role });
+    } else {
+      void fw.reset();
+    }
+  }, [loading, user]);
 
   useEffect(() => {
     setUnauthorizedHandler(() => setUser(null));

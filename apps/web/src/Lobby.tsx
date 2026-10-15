@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, type GameInfo } from "./api";
 import { GameCover } from "./games/covers";
+import { useChessEnabled } from "./fireweave/use-chess";
 import { CATEGORIES, inCategory, metaFor, type GameCategory } from "./games/meta";
 
 const HOT_IDS = ["chess", "connectfour", "tictactoe", "gomoku", "reversi", "memory"];
@@ -61,6 +62,7 @@ export function LobbyPage() {
   const [games, setGames] = useState<GameInfo[]>([]);
   const [error, setError] = useState("");
   const [cat, setCat] = useState<GameCategory>("all");
+  const chessOn = useChessEnabled();
 
   useEffect(() => {
     void api
@@ -69,11 +71,15 @@ export function LobbyPage() {
       .catch((e: Error) => setError(e.message));
   }, []);
 
-  const featured = useMemo(() => games.slice(0, 3), [games]);
-  const filtered = useMemo(() => games.filter((g) => inCategory(g.id, cat)), [games, cat]);
-  const hot = useMemo(() => byIds(games, HOT_IDS), [games]);
-  const quick = useMemo(() => byIds(games, QUICK_IDS), [games]);
-  const brain = useMemo(() => byIds(games, BRAIN_IDS), [games]);
+  const visible = useMemo(
+    () => (chessOn ? games : games.filter((g) => g.id !== "chess")),
+    [games, chessOn],
+  );
+  const featured = useMemo(() => visible.slice(0, 3), [visible]);
+  const filtered = useMemo(() => visible.filter((g) => inCategory(g.id, cat)), [visible, cat]);
+  const hot = useMemo(() => byIds(visible, HOT_IDS), [visible]);
+  const quick = useMemo(() => byIds(visible, QUICK_IDS), [visible]);
+  const brain = useMemo(() => byIds(visible, BRAIN_IDS), [visible]);
 
   if (error) {
     return (
@@ -138,8 +144,8 @@ export function LobbyPage() {
           {filtered.map((g, i) => (
             <GameTile key={g.id} game={g} size="md" delay={i * 30} />
           ))}
-          {!filtered.length && games.length ? <p className="hint">no games in this category</p> : null}
-          {!games.length ? <p className="hint">loading games…</p> : null}
+          {!filtered.length && visible.length ? <p className="hint">no games in this category</p> : null}
+          {!visible.length ? <p className="hint">loading games…</p> : null}
         </div>
       </section>
     </section>

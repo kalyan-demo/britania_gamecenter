@@ -16,6 +16,7 @@ import { AuthProvider, RequireAdmin, RequireAuth, useAuth } from "./auth";
 import { LobbyPage } from "./Lobby";
 import { GameBoard } from "./games/GameBoard";
 import { ArcadeMark, GameMark } from "./games/logos";
+import { useChessEnabled } from "./fireweave/use-chess";
 import { OutcomeFX } from "./games/outcome";
 
 type LoginMode = "player" | "admin";
@@ -180,12 +181,19 @@ function PlayPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [booting, setBooting] = useState(true);
+  const chessOn = useChessEnabled();
 
   useEffect(() => {
     let cancelled = false;
     setBooting(true);
     setError("");
     setMatch(null);
+    if (gameId === "chess" && !chessOn) {
+      setGame(null);
+      setError("unknown game");
+      setBooting(false);
+      return;
+    }
     void (async () => {
       try {
         const { games } = await api.games();
@@ -207,7 +215,7 @@ function PlayPage() {
     return () => {
       cancelled = true;
     };
-  }, [gameId]);
+  }, [gameId, chessOn]);
 
   async function move(body: unknown) {
     if (!game) return;

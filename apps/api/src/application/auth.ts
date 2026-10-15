@@ -1,3 +1,4 @@
+import { fw } from "@fireweaveai/server-sdk/start";
 import { AppError, type PublicUser } from "@arcade/shared";
 import type { ObservabilityPort, SessionRepository, TraceCtx, UserRepository } from "../domain/ports";
 import { makePasswordHash, makeToken, verifyPassword } from "../infrastructure/auth/password";
@@ -125,6 +126,10 @@ export function createAuthUseCases(deps: {
         username: user.username,
         role: user.role,
       };
+      await fw.identify(String(publicUser.id), {
+        username: publicUser.username,
+        role: publicUser.role,
+      });
       await deps.obs.emitAction({
         event: "auth.login",
         ...traceFields(trace),
@@ -158,17 +163,20 @@ export function createAuthUseCases(deps: {
     },
 
     /** Explicit /api/auth/me instrumentation (not used on every protected route). */
-    async trackSessionRestore(hit: boolean, username: string | undefined, trace?: TraceCtx) {
+    async trackSessionRestore(user: PublicUser | null, trace?: TraceCtx) {
+      if (user) {
+        await fw.identify(String(user.id), { username: user.username, role: user.role });
+      }
       await deps.obs.emitAction({
         event: "auth.session_restore",
         ...traceFields(trace),
-        user: username,
+        user: user?.username,
         logLevel: "debug",
         metrics: [
           {
             name: "arcade_events",
             value: 1,
-            labels: { event: "session_restore", result: hit ? "hit" : "miss" },
+            labels: { event: "session_restore", result: user ? "hit" : "miss" },
           },
         ],
       });
