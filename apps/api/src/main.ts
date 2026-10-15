@@ -1,3 +1,4 @@
+import "./fireweave/start"; // FireWeave: must stay the first import
 import { getServices } from "./bootstrap";
 import { createHandler } from "./interfaces/http/router";
 
