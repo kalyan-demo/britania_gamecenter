@@ -3,5 +3,8 @@
 import { defineControlPoints } from '@fireweaveai/server-sdk/start';
 
 export const controlPoints = defineControlPoints({
-  // 'new-checkout': { local: true },
+  chess: {
+    local: true,
+    description: 'Chess in the lobby and match API. Off hides the game.',
+  },
 });
